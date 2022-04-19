@@ -107,3 +107,10 @@ VSCode Files
 /.vscode/*
 BuildingEscape.code-workspace
 
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# IMPORTANT TEMPORARY !!!!!!!!!!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Content/__ExternalActors__/*
+Content/__ExternalObjects__/*
+Content/Characters
+Content/LevelPrototyping  
