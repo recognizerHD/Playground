@@ -110,7 +110,7 @@ void UNetworkMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatc
 	}
 }
 
-void UNetworkMenu::MenuTearDown(bool bIsNested = false)
+void UNetworkMenu::MenuTearDown()
 {
 	RemoveFromParent();
 	if (IsValid(CallingMenu))

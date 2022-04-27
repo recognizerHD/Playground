@@ -22,7 +22,7 @@ public:
 
 	// Remove the menu.
 	UFUNCTION(BlueprintCallable)
-	void MenuTearDown(bool bIsNested);
+	void MenuTearDown();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Input)
 	UWidget* CallingMenu;
