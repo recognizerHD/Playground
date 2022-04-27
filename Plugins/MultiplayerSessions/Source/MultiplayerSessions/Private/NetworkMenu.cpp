@@ -7,7 +7,6 @@
 #include "Components/Button.h"
 #include "MultiplayerSessionsSubsystem.h"
 #include "OnlineSubsystem.h"
-#include "../../../../Developer/RiderLink/Source/RD/thirdparty/clsocket/src/ActiveSocket.h"
 
 /**
  *
@@ -114,6 +113,11 @@ void UNetworkMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatc
 void UNetworkMenu::MenuTearDown(bool bIsNested = false)
 {
 	RemoveFromParent();
+	if (IsValid(CallingMenu))
+	{
+		CallingMenu->SetFocus();
+		return;
+	}
 	
 	if (UWorld* World = GetWorld())
 	{
@@ -172,13 +176,6 @@ void UNetworkMenu::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
 
 void UNetworkMenu::OnCreateSession(bool bWasSuccessful)
 {
-	// if (GEngine)
-	// {
-	// 	GEngine->AddOnScreenDebugMessage(
-	// 		-1, 15.f, FColor::Yellow,
-	// 			FString::Printf(TEXT("Was session created? %d"), bWasSuccessful));
-	// }
-
 	if (bWasSuccessful)
 	{
 		if (UWorld* World = GetWorld())

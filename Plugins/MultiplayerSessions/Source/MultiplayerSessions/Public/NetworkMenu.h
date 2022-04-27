@@ -6,7 +6,6 @@
 #include "OnlineSessionSettings.h"
 #include "Blueprint/UserWidget.h"
 #include "Interfaces/OnlineSessionInterface.h"
-#include "LogVisualizer/Public/LogVisualizerPublic.h"
 #include "NetworkMenu.generated.h"
 
 /**
@@ -24,6 +23,9 @@ public:
 	// Remove the menu.
 	UFUNCTION(BlueprintCallable)
 	void MenuTearDown(bool bIsNested);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Input)
+	UWidget* CallingMenu;
 
 	/**
 	 * Called after a key (keyboard, controller, ...) is pressed when this widget has focus (this event bubbles if not handled)
@@ -64,18 +66,18 @@ private:
 	//
 	// UFUNCTION()
 	// void JoinButtonClicked();
-
-
-
 	UFUNCTION(BlueprintCallable)
 	void JoinSessionsDirect();
 	UFUNCTION(BlueprintCallable)
 	void HostSessionDirect();
 
+
+
+
 	UFUNCTION(BlueprintCallable)
 	void FindSessions();
 	UFUNCTION(BlueprintCallable)
-	void JoinSession(int32 DetermineResultType); // What's supplied is a
+	void JoinSession(int32 DetermineResultType); // What's supplied is a Result or struct.
 	UFUNCTION(BlueprintCallable)
 	void CancelFindSessions();
 
