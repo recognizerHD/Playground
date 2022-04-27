@@ -22,6 +22,15 @@ UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem():
 
 void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FString MatchType)
 {
+	/**
+	 * TODO TO implement. And probably delegates as well.
+	 * SessionInterface->RegisterPlayer() - registers players as part of the session. Do I need this? 
+	 * SessionInterface->EndSession() - when the match is over
+	 * SessionInterface->StartSession() - when starting the match ( no longer in lobby )
+	 * SessionInterface->UpdateSession() - changing settings, turning off allow join in progress, toggling friends only, etc.
+	 *   - can use the change settings to prevent joining on extraction and results.
+	 */
+	
 	if (!SessionInterface.IsValid())
 	{
 		return;

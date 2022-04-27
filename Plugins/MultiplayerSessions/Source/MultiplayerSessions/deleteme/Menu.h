@@ -19,6 +19,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void MenuSetup(int32 NumberOfPublicConnections = 4, FString TypeOfMatch = FString(TEXT("FreeForAll")), FString LobbyPath = FString("/Game/ThirdPerson/Maps/Lobby"));
 
+	// Make the menu active
+	UFUNCTION(BlueprintCallable) 
+	void Activate();
+
+	// Remove the menu.
+	UFUNCTION(BlueprintCallable)
+	void Deactivate();
+
 protected:
 	virtual bool Initialize() override;
 	virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override;
@@ -36,16 +44,28 @@ protected:
 	void OnStartSession(bool bWasSuccessful);
 	
 private:
-	UPROPERTY(meta = (BindWidget))
-	class UButton* HostButton;
-	UPROPERTY(meta = (BindWidget))
-	class UButton* JoinButton;
+	// UPROPERTY(meta = (BindWidget))
+	// class UButton* HostButton;
+	// UPROPERTY(meta = (BindWidget))
+	// UButton* JoinButton;
+	//
+	// UFUNCTION()
+	// void HostButtonClicked();
+	//
+	// UFUNCTION()
+	// void JoinButtonClicked();
+	
+	UFUNCTION(BlueprintCallable)
+	void JoinSessionsDirect();
+	UFUNCTION(BlueprintCallable)
+	void HostSessionDirect();
 
-	UFUNCTION()
-	void HostButtonClicked();
-
-	UFUNCTION()
-	void JoinButtonClicked();
+	UFUNCTION(BlueprintCallable)
+	void FindSessions();
+	UFUNCTION(BlueprintCallable)
+	void JoinSession(int32 DetermineResultType); // What's supplied is a
+	UFUNCTION(BlueprintCallable)
+	void CancelFindSessions();
 
 	void MenuTearDown();
 	// The subsystem designed to handle all online session functionality.
