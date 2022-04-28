@@ -10,65 +10,48 @@
 
 /**
  *
- * All menus need either an interface or macro or whatever that's shared between all of them.
- * It will allow me to do 3 things:
- *	1. Capture Keypresses so Ican react to specific keys (Escape) to close the menu
- *	2. Load any menu. Either it's a menu loading another menu, or a level loading a menu.
- *	3. Close a menu. It should also know of the "stack" so it goes back to the previous menu if it's there, otherwise it's to the screen.
- *
- * 4. Know when to load what. This might wait until I'm able to load two levels at the same time and connect them like the streaming procedural level did.
+ * 1. Test Streaming for knowledge
+ *		- If loading levels, recreate controller? I'll guess yes.
+ *		- If loading levels, recreate menu? Again, yes.
+** 4. Know when to load what. This might wait until I'm able to load two levels at the same time and connect them like the streaming procedural level did.
  * a) does the game change the details when both are loaded, or does it only have the settings of the first loaded level?
  * b) I.e. can I step back and forth and details change?
- * c) how can I change
- * d) This will affect what the M key does.
- *  i) In a lobby, M brings up the server browser 
- *  ii) In a game, M brings up the mission map.
+ 
  *
- * TODO. So got lots still.
- * No buttons should be required. I'll use my own functions for them.
- * Main Menu - (Key:ESC)
- * - Quit Button - With Confirmation screen.
- * - Server Browser
- * - Mission Selection (Key:M)
- * - Resume (close button) (Key:ESC)
- * - Other Settings
- * - Change Session Settings (friends only / public / solo) (If solo AND other players, show confirmation screen before kicking)
- * - Leave Lobby (Leave Session)
+ *		
+ * 2. Determine how I'm going to create the project as a testing ground and move it to a real project.
+ *		- I'm thinking All games will be stored under Playground/CodeName. A folder under there. Once it's feasible that it becomes a game project, move it to Projects/GameName.
  *
- * Server Browser Menu
- * 1. Refresh Button ( Find Servers )
- *    - how to iterate
- * 2. Close button ( Blueprint Only )
- * 3. Click entry to Join ( Join Session )
+ * 3. Return to "CorpoRepo"
+ *  a) Quit Game. Get modal and make it work.
+ *  b) Splash screen (Press Any Key). Clicking any key will start a friends only game and host.
+ *   - Task for later. How to make a game friends only, join through steam, etc.
+ *   - (If I can accept keyboard input, that'd be perfect)
+ *  c) Server Browser. Only visible in lobby. https://www.youtube.com/watch?v=oO6foa5qDck 
+ *   i) Refresh actually loads items.
+ *    - how to iterate and show on the browser.
+ *   ii) Click result joins game.
+ *   iii) Close - works.
+ *   iv) Host vs Client options. If client or host with other players, show warning that action will kick all players.
+ *  d) Mission Selection. Host vs client options. (Only available in lobby. Once game is going, not available)
+ *  
+ *  e) Interface to allow loading of menus. 
+ *  i) Friends only toggle that will change session settings. (friends only / public / solo) (If solo AND other players, show confirmation screen before kicking)
+ *  j) Leave Lobby and re host as friends only.
+ *  f) Clean up variable names, functions, etc.
+ *  g) Migrate code to C++ where possible.
+ *  h) Create new project and migrate all content there.
+ *  i) Starting a session, without having to load a map, just changing.
+ *  j) switch back to lobby mode.
  *
- * Mission Selection Menu (Key:M) - Only available in Lobby
  *
- * Splash Screen
- * - Click any key ( Host Session - Friends Only ) (If I can accept keyboard input, that'd be perfect)
- *
- *
- *
- * 
- * 1. Finish UI screen. https://www.youtube.com/watch?v=oO6foa5qDck
- * 2. Refresh will do the "find servers"
- * 3.  - load results into browser menu
- * 4. Clicking a row will join a server (not auto on find)
- * 5. Filter results - flag this as future option.
- * 6. Quit button
- * 7. Esc brings up main menu.
- * 8. M button brings up server browser (when not in game)
- *
- * On start, after "click any key"
- *  - Create Session / Start Session
- *  - What is difference between create and start session? 
- *  - Make it: Solo | Friends | Public (remembers last setting)
- *  - Solo will kick all players because session will be ended?
- *  - Changing session type shouldn't kick players? Can it be changed afterwards? 
- *
- * Questions:
- *		When launching debug with multiple clients, why pressing host will close the menu on all clients?
- *		Can you change the session settings like friends only etc without kicking everyone and restarting the session?
- *
+ * 4. Wishlist items: Things I should add to Jira once I finish the above.
+ *  a) Keyboard input on menus if possible. Wishlist
+ *  b) Filter results - flag this as future option. Wishlist
+ *  c) Maybe allow for being a party and joining as a group? Wishlist
+ *  d) Steam specific or epic specific things like the Custom Game status thing.
+ *  
+ *  
  * For radio style button? 
  *  https://www.youtube.com/watch?v=E8QwYIPLc-c
  */
