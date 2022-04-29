@@ -10,15 +10,6 @@
 
 /**
  *
- * 1. Test Streaming for knowledge
- *		- If loading levels, recreate controller? I'll guess yes.
- *		- If loading levels, recreate menu? Again, yes.
-** 4. Know when to load what. This might wait until I'm able to load two levels at the same time and connect them like the streaming procedural level did.
- * a) does the game change the details when both are loaded, or does it only have the settings of the first loaded level?
- * b) I.e. can I step back and forth and details change?
- 
- *
- *		
  * 2. Determine how I'm going to create the project as a testing ground and move it to a real project.
  *		- I'm thinking All games will be stored under Playground/CodeName. A folder under there. Once it's feasible that it becomes a game project, move it to Projects/GameName.
  *
@@ -96,7 +87,7 @@ void UNetworkMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatc
 void UNetworkMenu::MenuTearDown()
 {
 	RemoveFromParent();
-	if (IsValid(CallingMenu))
+	if (bIsNestedMenu && IsValid(CallingMenu))
 	{
 		CallingMenu->SetFocus();
 		return;
@@ -120,10 +111,6 @@ void UNetworkMenu::FindSessions()
 	{
 		MultiplayerSessionsSubsystem->FindSession(10000);
 	}
-}
-
-void UNetworkMenu::JoinSession(int32 DetermineResultType)
-{
 }
 
 void UNetworkMenu::CancelFindSessions()
@@ -179,6 +166,7 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 		return;
 	}
 
+	TArray<FSessionResultWrapper> StructResults;
 	// Load 
 	for (auto Result : SearchResults)
 	{
@@ -187,18 +175,32 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 		FString SettingsValue;
 		Result.Session.SessionSettings.Get(FName("MatchType"), SettingsValue);
 
+		// Lets try adding everyone first, then we can put it into just ours.
+		auto ResultToAdd = FSessionResultWrapper{};
+		ResultToAdd.searchResult = Result;
+		StructResults.Add(ResultToAdd);
+		
 		if (SettingsValue == MatchType)
 		{
 			// THis will be replaced with clicking on a specific result. 
-			MultiplayerSessionsSubsystem->JoinSession(Result);
+			// MultiplayerSessionsSubsystem->JoinSession(Result);
 			return;
 		}
 	}
 
-	if (!bWasSuccessful || SearchResults.Num() == 0)
+	if (!bWasSuccessful || StructResults.Num() == 0)
 	{
-		// JoinButton->SetIsEnabled(true);
+		OnFindSessionsCompleteToBlueprint.Broadcast(StructResults);
+		// OnFindSessionsCompleteToBlueprint(StructResults, true);
+		// OnFindSessionsToBlueprint(StructResults);
+		
+	// 	// JoinButton->SetIsEnabled(true);
 	}
+}
+
+void UNetworkMenu::JoinSession(FSessionResultWrapper Result)
+{
+	MultiplayerSessionsSubsystem->JoinSession(Result.searchResult);
 }
 
 void UNetworkMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
