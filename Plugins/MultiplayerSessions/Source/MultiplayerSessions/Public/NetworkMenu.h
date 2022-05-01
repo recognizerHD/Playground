@@ -31,11 +31,11 @@ public:
 
 	// Remove the menu.
 	UFUNCTION(BlueprintCallable)
-	void MenuTearDown();
+	virtual void MenuTearDown();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Input)
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category=Input)
 	UWidget* CallingMenu;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Input)
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category=Input)
 	bool bIsNestedMenu;
 
 	/**
@@ -58,44 +58,43 @@ protected:
 	//
 	UFUNCTION()
 	void OnCreateSession(bool bWasSuccessful);
-	void OnFindSessions(const TArray<FOnlineSessionSearchResult>& SearchResults, bool bWasSuccessful);
-	// UFUNCTION(BlueprintImplementableEvent)
-	// void OnFindSessionsToBlueprint(const TArray<FSessionResultWrapper>& SearchResults);
-	void OnJoinSession(EOnJoinSessionCompleteResult::Type Result);
+	virtual void OnFindSessions(const TArray<FOnlineSessionSearchResult>& SearchResults, bool bWasSuccessful);
+	virtual void OnJoinSession(EOnJoinSessionCompleteResult::Type Result);
 	UFUNCTION()
 	void OnDestroySession(bool bWasSuccessful);
 	UFUNCTION()
 	void OnStartSession(bool bWasSuccessful);
 
+	// The subsystem designed to handle all online session functionality.
+	class UMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
+	
+
 private:
 	// UPROPERTY(meta = (BindWidget))
 	// class UButton* HostButton;
-	// UPROPERTY(meta = (BindWidget))
-	// UButton* JoinButton;
-	//
 	// UFUNCTION()
 	// void HostButtonClicked();
-	//
+	// UPROPERTY(meta = (BindWidget))
+	// UButton* JoinButton;
 	// UFUNCTION()
 	// void JoinButtonClicked();
 	UFUNCTION(BlueprintCallable)
 	void JoinSessionsDirect();
 	UFUNCTION(BlueprintCallable)
 	void HostSessionDirect();
+	UFUNCTION(BlueprintCallable)
+	void DestroySessionDirect();
 
 
 
 
 	UFUNCTION(BlueprintCallable)
-	void FindSessions();
+	virtual void FindSessions();
 	UFUNCTION(BlueprintCallable)
-	void JoinSession(FSessionResultWrapper Result); // What's supplied is a Result or struct.
+	virtual void JoinSession(FSessionResultWrapper Result); // What's supplied is a Result or struct.
 	UFUNCTION(BlueprintCallable)
 	void CancelFindSessions();
-
-	// The subsystem designed to handle all online session functionality.
-	class UMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
-
+	
 	int32 NumPublicConnections{4};
 	FString MatchType{TEXT("FreeForAll")};
 	FString PathToLobby{TEXT("")};

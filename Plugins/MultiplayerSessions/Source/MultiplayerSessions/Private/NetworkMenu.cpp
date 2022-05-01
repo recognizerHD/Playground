@@ -105,14 +105,6 @@ void UNetworkMenu::MenuTearDown()
 }
 
 
-void UNetworkMenu::FindSessions()
-{
-	if (MultiplayerSessionsSubsystem)
-	{
-		MultiplayerSessionsSubsystem->FindSession(10000);
-	}
-}
-
 void UNetworkMenu::CancelFindSessions()
 {
 }
@@ -123,17 +115,6 @@ bool UNetworkMenu::Initialize()
 	{
 		return false;
 	}
-
-	// This is how I'd call buttons dynamically. I'd rather use blueprint to set that up.
-	// if (HostButton)
-	// {
-	// 	HostButton->OnClicked.AddDynamic(this, &UNetworkMenu::HostButtonClicked);
-	// }
-	//
-	// if (JoinButton)
-	// {
-	// 	JoinButton->OnClicked.AddDynamic(this, &UNetworkMenu::JoinButtonClicked);
-	// }
 
 	return true;
 }
@@ -159,15 +140,38 @@ void UNetworkMenu::OnCreateSession(bool bWasSuccessful)
 	}
 }
 
+void UNetworkMenu::FindSessions()
+{
+	if (MultiplayerSessionsSubsystem)
+	{
+		MultiplayerSessionsSubsystem->FindSession(10000);
+	}
+}
+
 void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SearchResults, bool bWasSuccessful)
 {
+	// https://forums.unrealengine.com/t/steam-reports-a-found-session-but-failed-onsessionfound/360318/2
+	// The link states that to find sessions, you need to destroy all joined or created sessions first.
+	UE_LOG(LogTemp, Warning, TEXT(" >>>> Find session menu function called."));
 	if (MultiplayerSessionsSubsystem == nullptr)
 	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				4, 60.f, FColor::Yellow,
+				FString::Printf(TEXT("Is Null. %d .. %d"), SearchResults.Num(), bWasSuccessful));
+		}
 		return;
 	}
 
 	TArray<FSessionResultWrapper> StructResults;
 	// Load 
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			4, 60.f, FColor::Yellow,
+			FString::Printf(TEXT("Looping through results now. %d .. %d"), SearchResults.Num(), bWasSuccessful));
+	}
 	for (auto Result : SearchResults)
 	{
 		FString Id = Result.GetSessionIdStr();
@@ -180,11 +184,17 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 		ResultToAdd.searchResult = Result;
 		StructResults.Add(ResultToAdd);
 		
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1, 5.f, FColor::Green,
+				FString::Printf(TEXT("Session ID: %s"), *Id));
+		}
 		if (SettingsValue == MatchType)
 		{
 			// THis will be replaced with clicking on a specific result. 
-			// MultiplayerSessionsSubsystem->JoinSession(Result);
-			return;
+			MultiplayerSessionsSubsystem->JoinSession(Result);
+			// return;
 		}
 	}
 
@@ -215,6 +225,13 @@ void UNetworkMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 			{
 				if (APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController())
 				{
+					if (GEngine)
+					{
+						GEngine->AddOnScreenDebugMessage(
+							-1, 15.f, FColor::Yellow,
+							FString::Printf(TEXT("Found and Joining Session")));
+					}
+	
 					PlayerController->ClientTravel(Address, TRAVEL_Absolute);
 				}
 			}
@@ -272,5 +289,13 @@ void UNetworkMenu::HostSessionDirect()
 	if (MultiplayerSessionsSubsystem)
 	{
 		MultiplayerSessionsSubsystem->CreateSession(NumPublicConnections, MatchType);
+	}
+}
+
+void UNetworkMenu::DestroySessionDirect()
+{
+	if (MultiplayerSessionsSubsystem)
+	{
+		MultiplayerSessionsSubsystem->DestroySession();
 	}
 }
