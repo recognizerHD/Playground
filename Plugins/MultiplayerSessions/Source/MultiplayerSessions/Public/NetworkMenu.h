@@ -7,12 +7,33 @@
 #include "Blueprint/UserWidget.h"
 #include "Interfaces/OnlineSessionInterface.h"
 // #include "FindSessionsCallbackProxy.h"
+// #include "../../../../../Source/Playground/EnumGameSessions.h"
 #include "NetworkMenu.generated.h"
 
 USTRUCT(BlueprintType)
 struct FSessionResultWrapper
 {
 	GENERATED_BODY()
+
+	// Temp until we allow it to be overriden
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input)
+	// ERisk Risk;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input)
+	// EOperationSize OperationSize;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input)
+	// EGameModifiers Modifiers;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input)
+	TArray<FString> Foobar;
+	FString HostName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input)
+	FString Description;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input)
+	FString PlayerClasses;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input)
+	FString Team;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input)
+	int32 Time;
+
 	FOnlineSessionSearchResult searchResult;
 };
 

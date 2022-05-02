@@ -7,9 +7,22 @@
 #include "Components/Button.h"
 #include "MultiplayerSessionsSubsystem.h"
 #include "OnlineSubsystem.h"
+// #include "../../../../../Source/Playground/GameSessions.h"
 
 /**
  *
+
+
+Restart the project.
+Move the network code into the main project and see if I can get it to be in it's own folder for organization.
+Get everything else to work properly.
+I should be able to then interlink things fine.
+
+I may need to have everything exist in both places so that I can migrate the blueprints to the new class.
+
+
+
+
  * 2. Determine how I'm going to create the project as a testing ground and move it to a real project.
  *		- I'm thinking All games will be stored under Playground/CodeName. A folder under there. Once it's feasible that it becomes a game project, move it to Projects/GameName.
  *
@@ -92,7 +105,7 @@ void UNetworkMenu::MenuTearDown()
 		CallingMenu->SetFocus();
 		return;
 	}
-	
+
 	if (UWorld* World = GetWorld())
 	{
 		if (APlayerController* PlayerController = World->GetFirstPlayerController())
@@ -150,68 +163,191 @@ void UNetworkMenu::FindSessions()
 
 void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SearchResults, bool bWasSuccessful)
 {
-	// https://forums.unrealengine.com/t/steam-reports-a-found-session-but-failed-onsessionfound/360318/2
-	// The link states that to find sessions, you need to destroy all joined or created sessions first.
-	UE_LOG(LogTemp, Warning, TEXT(" >>>> Find session menu function called."));
-	if (MultiplayerSessionsSubsystem == nullptr)
-	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-				4, 60.f, FColor::Yellow,
-				FString::Printf(TEXT("Is Null. %d .. %d"), SearchResults.Num(), bWasSuccessful));
-		}
-		return;
-	}
-
-	TArray<FSessionResultWrapper> StructResults;
-	// Load 
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			4, 60.f, FColor::Yellow,
-			FString::Printf(TEXT("Looping through results now. %d .. %d"), SearchResults.Num(), bWasSuccessful));
-	}
-	for (auto Result : SearchResults)
-	{
-		FString Id = Result.GetSessionIdStr();
-		FString User = Result.Session.OwningUserName;
-		FString SettingsValue;
-		Result.Session.SessionSettings.Get(FName("MatchType"), SettingsValue);
-
-		// Lets try adding everyone first, then we can put it into just ours.
-		auto ResultToAdd = FSessionResultWrapper{};
-		ResultToAdd.searchResult = Result;
-		StructResults.Add(ResultToAdd);
-		
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-				-1, 5.f, FColor::Green,
-				FString::Printf(TEXT("Session ID: %s"), *Id));
-		}
-		if (SettingsValue == MatchType)
-		{
-			// THis will be replaced with clicking on a specific result. 
-			MultiplayerSessionsSubsystem->JoinSession(Result);
-			// return;
-		}
-	}
-
-	if (!bWasSuccessful || StructResults.Num() == 0)
-	{
-		OnFindSessionsCompleteToBlueprint.Broadcast(StructResults);
-		// OnFindSessionsCompleteToBlueprint(StructResults, true);
-		// OnFindSessionsToBlueprint(StructResults);
-		
-	// 	// JoinButton->SetIsEnabled(true);
-	}
+// 	// https://forums.unrealengine.com/t/steam-reports-a-found-session-but-failed-onsessionfound/360318/2
+// 	// The link states that to find sessions, you need to destroy all joined or created sessions first.
+// 	UE_LOG(LogTemp, Warning, TEXT(" >>>> Find session menu function called."));
+// 	if (MultiplayerSessionsSubsystem == nullptr)
+// 	{
+// 		if (GEngine)
+// 		{
+// 			GEngine->AddOnScreenDebugMessage(
+// 				4, 60.f, FColor::Yellow,
+// 				FString::Printf(TEXT("Is Null. %d .. %d"), SearchResults.Num(), bWasSuccessful));
+// 		}
+// 		return;
+// 	}
+//
+// 	TArray<FSessionResultWrapper> StructResults;
+// 	// Load 
+// 	if (GEngine)
+// 	{
+// 		GEngine->AddOnScreenDebugMessage(
+// 			4, 60.f, FColor::Yellow,
+// 			FString::Printf(TEXT("Looping through results now. %d .. %d"), SearchResults.Num(), bWasSuccessful));
+// 	}
+// 	for (auto Result : SearchResults)
+// 	{
+// 		FString Id = Result.GetSessionIdStr();
+// 		FString User = Result.Session.OwningUserName;
+// 		FString SettingsValue;
+// 		Result.Session.SessionSettings.Get(FName("MatchType"), SettingsValue);
+//
+// 		// Lets try adding everyone first, then we can put it into just ours.
+// 		auto ResultToAdd = FSessionResultWrapper{};
+// 		ResultToAdd.searchResult = Result;
+// 		StructResults.Add(ResultToAdd);
+//
+// 		if (GEngine)
+// 		{
+// 			GEngine->AddOnScreenDebugMessage(
+// 				-1, 5.f, FColor::Green,
+// 				FString::Printf(TEXT("Session ID: %s"), *Id));
+// 		}
+// 		if (SettingsValue == MatchType)
+// 		{
+// 			// THis will be replaced with clicking on a specific result. 
+// 			MultiplayerSessionsSubsystem->JoinSession(Result);
+// 			// return;
+// 		}
+// 	}
+//
+// 	// TArray<ERisk> Risks;
+// 	// Risks.Push(ERisk::RE_Easy);
+// 	// Risks.Push(ERisk::RE_Moderate);
+// 	// Risks.Push(ERisk::RE_Hard);
+// 	// Risks.Push(ERisk::RE_Professional);
+// 	// Risks.Push(ERisk::RE_Elite);
+// 	//
+// 	// TArray<EOperationSize> OperationSizes;
+// 	// OperationSizes.Push(EOperationSize::OSE_Short);
+// 	// OperationSizes.Push(EOperationSize::OSE_Medium);
+// 	// OperationSizes.Push(EOperationSize::OSE_Long);
+// 	// OperationSizes.Push(EOperationSize::OSE_Enduring);
+// 	//
+// 	// TArray<EGameModifiers> Mutators;
+// 	// Mutators.Push(EGameModifiers::GME_Clash);
+// 	// Mutators.Push(EGameModifiers::GME_Foggy);
+// 	// Mutators.Push(EGameModifiers::GME_Hunter);
+// 	// Mutators.Push(EGameModifiers::GME_Jammers);
+// 	// Mutators.Push(EGameModifiers::GME_BadWeather);
+// 	// Mutators.Push(EGameModifiers::GME_LowAmmo);
+// 	// Mutators.Push(EGameModifiers::GME_LowGravity);
+// 	//
+// 	// TArray<FString> HostNames;
+// 	// HostNames.Push(FString("Recognizer"));
+// 	// HostNames.Push(FString("BobRoberts"));
+// 	// HostNames.Push(FString("C4T5_Me0w"));
+// 	// HostNames.Push(FString("Blitzzz"));
+// 	// HostNames.Push(FString("Feckle"));
+// 	// HostNames.Push(FString("Nicodemus"));
+// 	// HostNames.Push(FString("BOOLEAN"));
+// 	// HostNames.Push(FString("BlueCrayon"));
+// 	// HostNames.Push(FString("Cruxix"));
+// 	// HostNames.Push(FString("Trapdoor"));
+// 	// HostNames.Push(FString("mushmouth"));
+// 	// HostNames.Push(FString("fahkfhkjsadfhjkdfs"));
+// 	// HostNames.Push(FString("fart"));
+// 	// HostNames.Push(FString("fart__"));
+// 	// HostNames.Push(FString("fart______lol"));
+// 	// HostNames.Push(FString("shart"));
+// 	// HostNames.Push(FString("iknowwhatyoudidthere"));
+// 	// HostNames.Push(FString("pickles"));
+// 	// HostNames.Push(FString("Riteous"));
+// 	// HostNames.Push(FString("Orlandu"));
+// 	//
+// 	// TArray<FString> ServerDescriptions;
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString("Chill bruh."));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString("PROS ONLY U NUBCAKES!"));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString("Must be 7' to join."));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString("Worship me."));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString("Friendly server. Any class welcome."));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString(""));
+// 	// ServerDescriptions.Push(FString("This is a story all about how my life got flipped turned upside-down."));
+// 	//
+// 	// TArray<FString> PlayerClasses;
+// 	// PlayerClasses.Push(FString("T")); // Turrets
+// 	// PlayerClasses.Push(FString("Z")); // Turrets
+// 	// PlayerClasses.Push(FString("D")); // Turrets
+// 	// PlayerClasses.Push(FString("G")); // Turrets
+// 	// PlayerClasses.Push(FString("R")); // Turrets
+// 	// PlayerClasses.Push(FString("M")); // Turrets
+// 	// PlayerClasses.Push(FString("P")); // Turrets
+// 	// PlayerClasses.Push(FString("S")); // Turrets
+// 	// PlayerClasses.Push(FString("H")); // Turrets
+// 	// PlayerClasses.Push(FString("J")); // Turrets
+//
+// 	// for (int32 i = 1; i < 60; i++)
+// 	// {
+// 	// 	auto ResultToAdd = FSessionResultWrapper{};
+// 	// 	ResultToAdd.searchResult = *(new FOnlineSessionSearchResult());
+// 	// 	int8 iRisk = rand() % Risks.Num();
+// 	// 	ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Risk"), Risks[iRisk]);
+// 	// 	int8 iTeam = rand() % 4;
+// 	// 	FString teamString = "";
+// 	// 	for (int8 j = 1; j <= 4; j++)
+// 	// 	{
+// 	// 		if (j <= iTeam + 1)
+// 	// 		{
+// 	// 			int8 iClass1 = rand() % PlayerClasses.Num();
+// 	// 			int8 iClass2 = rand() % PlayerClasses.Num();
+// 	// 			teamString.Append(PlayerClasses[iClass1]);
+// 	// 			teamString.Append(PlayerClasses[iClass2]);
+// 	// 		}
+// 	// 		else
+// 	// 		{
+// 	// 			teamString.Append("--");
+// 	// 		}
+// 	// 		if (j < 4)
+// 	// 		{
+// 	// 			teamString.Append(" | ");
+// 	// 		}
+// 	// 	}
+// 	// 	ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Team"), teamString);
+// 	// 	int8 iTime = rand() % (60 * 60);
+// 	// 	bool bIsStarted = (rand() % 2) ? true : false;
+// 	// 	ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Time"), bIsStarted ? iTime : -1);
+// 	// 	int8 iSize = rand() % OperationSizes.Num();
+// 	// 	ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Size"), OperationSizes[iSize]);
+// 	// 	int8 iHost = rand() % HostNames.Num();
+// 	// 	ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Host"), HostNames[iHost]);
+// 	// 	int8 iDesc = rand() % ServerDescriptions.Num();
+// 	// 	ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Desc"), ServerDescriptions[iDesc]);
+// 	// 	ResultToAdd.Description = ServerDescriptions[iDesc];
+// 	// 	ResultToAdd.HostName = HostNames[iHost];
+// 	// 	ResultToAdd.OperationSize = OperationSizes[iSize];
+// 	// 	ResultToAdd.Time = bIsStarted ? iTime : -1;
+// 	// 	ResultToAdd.Team = teamString;
+// 	// 	ResultToAdd.Risk = Risks[iRisk];
+// 	//
+// 	// 	StructResults.Add(ResultToAdd);
+// 	// }
+//
+// 	OnFindSessionsCompleteToBlueprint.Broadcast(StructResults);
+// 	if (!bWasSuccessful || StructResults.Num() == 0)
+// 	{
+// 		// OnFindSessionsCompleteToBlueprint.Broadcast(StructResults);
+// 		// 	// JoinButton->SetIsEnabled(true);
+// 	}
 }
 
-void UNetworkMenu::JoinSession(FSessionResultWrapper Result)
-{
+ void UNetworkMenu::JoinSession(FSessionResultWrapper Result)
+ {
 	MultiplayerSessionsSubsystem->JoinSession(Result.searchResult);
-}
+ }
 
 void UNetworkMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 {
@@ -231,7 +367,7 @@ void UNetworkMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 							-1, 15.f, FColor::Yellow,
 							FString::Printf(TEXT("Found and Joining Session")));
 					}
-	
+
 					PlayerController->ClientTravel(Address, TRAVEL_Absolute);
 				}
 			}
