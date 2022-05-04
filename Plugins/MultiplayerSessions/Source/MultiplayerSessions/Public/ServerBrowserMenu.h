@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NetworkMenu.h"
+#include "ZNetworkMenu.h"
 #include "ServerBrowserMenu.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MULTIPLAYERSESSIONS_API UServerBrowserMenu : public UNetworkMenu
+class MULTIPLAYERSESSIONS_API UServerBrowserMenu : public UZNetworkMenu
 {
 	GENERATED_BODY()
 public:
@@ -26,12 +26,12 @@ protected:
 private:
 
 	// The subsystem designed to handle all online session functionality.
-	// class UMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
-	class UMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
+	// class UZMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
+	class UZMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
 	
 	// UFUNCTION(BlueprintCallable)
 	virtual void FindSessions() override;
 	// UFUNCTION(BlueprintCallable)
 
-	virtual void JoinSession(FSessionResultWrapper Result); // What's supplied is a Result or struct.
+	virtual void JoinSession(FZSessionResultWrapper Result); // What's supplied is a Result or struct.
 }; 

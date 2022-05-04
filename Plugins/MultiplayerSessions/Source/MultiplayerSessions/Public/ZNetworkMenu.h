@@ -8,10 +8,10 @@
 #include "Interfaces/OnlineSessionInterface.h"
 // #include "FindSessionsCallbackProxy.h"
 // #include "../../../../../Source/Playground/EnumGameSessions.h"
-#include "NetworkMenu.generated.h"
+#include "ZNetworkMenu.generated.h"
 
 USTRUCT(BlueprintType)
-struct FSessionResultWrapper
+struct FZSessionResultWrapper
 {
 	GENERATED_BODY()
 
@@ -37,12 +37,12 @@ struct FSessionResultWrapper
 	FOnlineSessionSearchResult searchResult;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFindSessionsCompleteToBlueprint, const TArray<FSessionResultWrapper>&, SessionResults);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFindSessionsCompleteToBlueprint, const TArray<FZSessionResultWrapper>&, SessionResults);
 /**
  * 
  */
 UCLASS()
-class MULTIPLAYERSESSIONS_API UNetworkMenu : public UUserWidget
+class MULTIPLAYERSESSIONS_API UZNetworkMenu : public UUserWidget
 {
 	GENERATED_BODY()
 public:
@@ -87,7 +87,7 @@ protected:
 	void OnStartSession(bool bWasSuccessful);
 
 	// The subsystem designed to handle all online session functionality.
-	class UMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
+	class UZMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
 	
 
 private:
@@ -112,7 +112,7 @@ private:
 	UFUNCTION(BlueprintCallable)
 	virtual void FindSessions();
 	UFUNCTION(BlueprintCallable)
-	virtual void JoinSession(FSessionResultWrapper Result); // What's supplied is a Result or struct.
+	virtual void JoinSession(FZSessionResultWrapper Result); // What's supplied is a Result or struct.
 	UFUNCTION(BlueprintCallable)
 	void CancelFindSessions();
 	

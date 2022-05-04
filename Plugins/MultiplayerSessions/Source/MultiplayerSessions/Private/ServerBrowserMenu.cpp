@@ -2,7 +2,7 @@
 
 
 #include "ServerBrowserMenu.h"
-#include "MultiplayerSessionsSubsystem.h"
+#include "ZMultiplayerSessionsSubsystem.h"
 
 
 void UServerBrowserMenu::MenuTearDown()
@@ -17,7 +17,7 @@ void UServerBrowserMenu::BindDelegates()
 {
 	if (UGameInstance* GameInstance = GetGameInstance())
 	{
-		MultiplayerSessionsSubsystem = GameInstance->GetSubsystem<UMultiplayerSessionsSubsystem>();
+		MultiplayerSessionsSubsystem = GameInstance->GetSubsystem<UZMultiplayerSessionsSubsystem>();
 	}
 
 	if (MultiplayerSessionsSubsystem)
@@ -25,8 +25,8 @@ void UServerBrowserMenu::BindDelegates()
 		// MultiplayerSessionsSubsystem->MultiplayerOnCreateSessionComplete.AddDynamic(this, &ThisClass::OnCreateSession);
 		// MultiplayerSessionsSubsystem->MultiplayerOnFindSessionsComplete.AddUObject(this, &ThisClass::OnFindSessions);
 		MultiplayerSessionsSubsystem->MultiplayerOnJoinSessionComplete.AddUObject(this, &ThisClass::OnJoinSession);
-		// MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.AddDynamic(this, &ThisClass::UNetworkMenu::OnDestroySession);
-		// MultiplayerSessionsSubsystem->MultiplayerOnStartSessionComplete.AddDynamic(this, &ThisClass::UNetworkMenu::OnStartSession);
+		// MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.AddDynamic(this, &ThisClass::UZNetworkMenu::OnDestroySession);
+		// MultiplayerSessionsSubsystem->MultiplayerOnStartSessionComplete.AddDynamic(this, &ThisClass::UZNetworkMenu::OnStartSession);
 	}
 }
 
@@ -42,7 +42,7 @@ void UServerBrowserMenu::FindSessions()
 {
 }
 
-void UServerBrowserMenu::JoinSession(FSessionResultWrapper Result)
+void UServerBrowserMenu::JoinSession(FZSessionResultWrapper Result)
 {
 	MultiplayerSessionsSubsystem->JoinSession(Result.searchResult);
 }

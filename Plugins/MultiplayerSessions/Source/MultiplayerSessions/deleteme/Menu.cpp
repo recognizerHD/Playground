@@ -3,9 +3,9 @@
 
 #include "Menu.h"
 
-#include "MultiplayerSessionsSubsystem.h"
+#include "ZMultiplayerSessionsSubsystem.h"
 #include "Components/Button.h"
-#include "MultiplayerSessionsSubsystem.h"
+#include "ZMultiplayerSessionsSubsystem.h"
 #include "OnlineSubsystem.h"
 
 /**
@@ -82,7 +82,7 @@ void UMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch, FStr
 	Activate();
 	if (UGameInstance* GameInstance = GetGameInstance())
 	{
-		MultiplayerSessionsSubsystem = GameInstance->GetSubsystem<UMultiplayerSessionsSubsystem>();
+		MultiplayerSessionsSubsystem = GameInstance->GetSubsystem<UZMultiplayerSessionsSubsystem>();
 	}
 
 	if (MultiplayerSessionsSubsystem)

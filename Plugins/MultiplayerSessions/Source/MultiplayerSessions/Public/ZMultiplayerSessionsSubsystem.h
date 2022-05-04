@@ -6,7 +6,7 @@
 #include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Subsystems/GameInstanceSubsystem.h"
-#include "MultiplayerSessionsSubsystem.generated.h"
+#include "ZMultiplayerSessionsSubsystem.generated.h"
 
 //
 // Declaring our own custom delegates for the Menu class to bind callbacks to
@@ -21,12 +21,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnStartSessionComplete, 
  * 
  */
 UCLASS()
-class MULTIPLAYERSESSIONS_API UMultiplayerSessionsSubsystem : public UGameInstanceSubsystem
+class MULTIPLAYERSESSIONS_API UZMultiplayerSessionsSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
 public:
-	UMultiplayerSessionsSubsystem();
+	UZMultiplayerSessionsSubsystem();
 
 	// To handle session functionality, the menu class will call these.
 	void CreateSession(int32 NumPublicConnections, FString MatchType);

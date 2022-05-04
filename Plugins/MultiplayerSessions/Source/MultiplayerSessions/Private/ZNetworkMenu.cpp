@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "NetworkMenu.h"
+#include "ZNetworkMenu.h"
 
-#include "MultiplayerSessionsSubsystem.h"
+#include "ZMultiplayerSessionsSubsystem.h"
 #include "Components/Button.h"
-#include "MultiplayerSessionsSubsystem.h"
+#include "ZMultiplayerSessionsSubsystem.h"
 #include "OnlineSubsystem.h"
 // #include "../../../../../Source/Playground/GameSessions.h"
 
@@ -60,7 +60,7 @@ I may need to have everything exist in both places so that I can migrate the blu
  *  https://www.youtube.com/watch?v=E8QwYIPLc-c
  */
 
-void UNetworkMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch, FString LobbyPath)
+void UZNetworkMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch, FString LobbyPath)
 {
 	PathToLobby = FString::Printf(TEXT("%s?listen"), *LobbyPath);
 	NumPublicConnections = NumberOfPublicConnections;
@@ -84,7 +84,7 @@ void UNetworkMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatc
 
 	if (UGameInstance* GameInstance = GetGameInstance())
 	{
-		MultiplayerSessionsSubsystem = GameInstance->GetSubsystem<UMultiplayerSessionsSubsystem>();
+		MultiplayerSessionsSubsystem = GameInstance->GetSubsystem<UZMultiplayerSessionsSubsystem>();
 	}
 
 	if (MultiplayerSessionsSubsystem)
@@ -92,12 +92,12 @@ void UNetworkMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatc
 		MultiplayerSessionsSubsystem->MultiplayerOnCreateSessionComplete.AddDynamic(this, &ThisClass::OnCreateSession);
 		MultiplayerSessionsSubsystem->MultiplayerOnFindSessionsComplete.AddUObject(this, &ThisClass::OnFindSessions);
 		MultiplayerSessionsSubsystem->MultiplayerOnJoinSessionComplete.AddUObject(this, &ThisClass::OnJoinSession);
-		MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.AddDynamic(this, &ThisClass::UNetworkMenu::OnDestroySession);
-		MultiplayerSessionsSubsystem->MultiplayerOnStartSessionComplete.AddDynamic(this, &ThisClass::UNetworkMenu::OnStartSession);
+		MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.AddDynamic(this, &ThisClass::OnDestroySession);
+		MultiplayerSessionsSubsystem->MultiplayerOnStartSessionComplete.AddDynamic(this, &ThisClass::OnStartSession);
 	}
 }
 
-void UNetworkMenu::MenuTearDown()
+void UZNetworkMenu::MenuTearDown()
 {
 	RemoveFromParent();
 	if (bIsNestedMenu && IsValid(CallingMenu))
@@ -118,11 +118,11 @@ void UNetworkMenu::MenuTearDown()
 }
 
 
-void UNetworkMenu::CancelFindSessions()
+void UZNetworkMenu::CancelFindSessions()
 {
 }
 
-bool UNetworkMenu::Initialize()
+bool UZNetworkMenu::Initialize()
 {
 	if (!Super::Initialize())
 	{
@@ -132,13 +132,13 @@ bool UNetworkMenu::Initialize()
 	return true;
 }
 
-void UNetworkMenu::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
+void UZNetworkMenu::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
 {
 	MenuTearDown();
 	Super::OnLevelRemovedFromWorld(InLevel, InWorld);
 }
 
-void UNetworkMenu::OnCreateSession(bool bWasSuccessful)
+void UZNetworkMenu::OnCreateSession(bool bWasSuccessful)
 {
 	if (bWasSuccessful)
 	{
@@ -153,7 +153,7 @@ void UNetworkMenu::OnCreateSession(bool bWasSuccessful)
 	}
 }
 
-void UNetworkMenu::FindSessions()
+void UZNetworkMenu::FindSessions()
 {
 	if (MultiplayerSessionsSubsystem)
 	{
@@ -161,7 +161,7 @@ void UNetworkMenu::FindSessions()
 	}
 }
 
-void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SearchResults, bool bWasSuccessful)
+void UZNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SearchResults, bool bWasSuccessful)
 {
 // 	// https://forums.unrealengine.com/t/steam-reports-a-found-session-but-failed-onsessionfound/360318/2
 // 	// The link states that to find sessions, you need to destroy all joined or created sessions first.
@@ -177,7 +177,7 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 // 		return;
 // 	}
 //
-// 	TArray<FSessionResultWrapper> StructResults;
+// 	TArray<FZSessionResultWrapper> StructResults;
 // 	// Load 
 // 	if (GEngine)
 // 	{
@@ -193,7 +193,7 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 // 		Result.Session.SessionSettings.Get(FName("MatchType"), SettingsValue);
 //
 // 		// Lets try adding everyone first, then we can put it into just ours.
-// 		auto ResultToAdd = FSessionResultWrapper{};
+// 		auto ResultToAdd = FZSessionResultWrapper{};
 // 		ResultToAdd.searchResult = Result;
 // 		StructResults.Add(ResultToAdd);
 //
@@ -292,7 +292,7 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 //
 // 	// for (int32 i = 1; i < 60; i++)
 // 	// {
-// 	// 	auto ResultToAdd = FSessionResultWrapper{};
+// 	// 	auto ResultToAdd = FZSessionResultWrapper{};
 // 	// 	ResultToAdd.searchResult = *(new FOnlineSessionSearchResult());
 // 	// 	int8 iRisk = rand() % Risks.Num();
 // 	// 	ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Risk"), Risks[iRisk]);
@@ -344,12 +344,12 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 // 	}
 }
 
- void UNetworkMenu::JoinSession(FSessionResultWrapper Result)
+ void UZNetworkMenu::JoinSession(FZSessionResultWrapper Result)
  {
 	MultiplayerSessionsSubsystem->JoinSession(Result.searchResult);
  }
 
-void UNetworkMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
+void UZNetworkMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 {
 	if (IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get())
 	{
@@ -379,22 +379,22 @@ void UNetworkMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 	}
 }
 
-void UNetworkMenu::OnDestroySession(bool bWasSuccessful)
+void UZNetworkMenu::OnDestroySession(bool bWasSuccessful)
 {
 	// JoinButton->SetIsEnabled(true);
 	// HostButton->SetIsEnabled(true);
 }
 
-void UNetworkMenu::OnStartSession(bool bWasSuccessful)
+void UZNetworkMenu::OnStartSession(bool bWasSuccessful)
 {
 }
 
-// FEventReply UNetworkMenu::OnKeyDown(FGeometry MyGeometry, FKeyEvent InKeyEvent)
+// FEventReply UZNetworkMenu::OnKeyDown(FGeometry MyGeometry, FKeyEvent InKeyEvent)
 // {
 //   return FEventReply(true);
 // }
 
-// void UNetworkMenu::HostButtonClicked()
+// void UZNetworkMenu::HostButtonClicked()
 // {
 // 	HostButton->SetIsEnabled(false);
 // 	if (MultiplayerSessionsSubsystem)
@@ -403,7 +403,7 @@ void UNetworkMenu::OnStartSession(bool bWasSuccessful)
 // 	}
 // }
 //
-// void UNetworkMenu::JoinButtonClicked()
+// void UZNetworkMenu::JoinButtonClicked()
 // {
 // 	JoinButton->SetIsEnabled(false);
 // 	if (MultiplayerSessionsSubsystem)
@@ -412,7 +412,7 @@ void UNetworkMenu::OnStartSession(bool bWasSuccessful)
 // 	}
 // }
 
-void UNetworkMenu::JoinSessionsDirect()
+void UZNetworkMenu::JoinSessionsDirect()
 {
 	if (MultiplayerSessionsSubsystem)
 	{
@@ -420,7 +420,7 @@ void UNetworkMenu::JoinSessionsDirect()
 	}
 }
 
-void UNetworkMenu::HostSessionDirect()
+void UZNetworkMenu::HostSessionDirect()
 {
 	if (MultiplayerSessionsSubsystem)
 	{
@@ -428,7 +428,7 @@ void UNetworkMenu::HostSessionDirect()
 	}
 }
 
-void UNetworkMenu::DestroySessionDirect()
+void UZNetworkMenu::DestroySessionDirect()
 {
 	if (MultiplayerSessionsSubsystem)
 	{
