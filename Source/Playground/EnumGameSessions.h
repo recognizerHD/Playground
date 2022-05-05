@@ -37,6 +37,25 @@ enum class EGameModifiers : uint8
 	GME_Jammers UMETA(DisplayName="Jammers"), // All objects are points of interest with no more details. Radar is glitchy.
 	GME_BadWeather UMETA(DisplayName="Bad Weather"), // There's weather.
 };
+
+
+// Example usage GetEnumValueAsString<EVictoryEnum>("EVictoryEnum", VictoryEnum))); 
+template<typename TEnum>
+static FORCEINLINE FString GetEnumValueAsString(const FString& Name, TEnum Value) {
+	const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, *Name, true);
+	if (!enumPtr) return FString("Invalid");
+	return enumPtr->GetNameByValue((int64)Value).ToString();
+}
+
+template <typename EnumType>
+static FORCEINLINE EnumType GetEnumValueFromString(const FString& EnumName, const FString& String) {
+	UEnum* Enum = FindObject<UEnum>(ANY_PACKAGE, *EnumName, true);
+	if(!Enum) { 
+		return EnumType(0);
+	}		
+	return (EnumType)Enum->FindEnumIndex(FName(*String));
+}
+	//Sample Usage FString ParseLine = GetEnumValueAsString<EChallenge>("EChallenge", VictoryEnumValue))); //To String EChallenge Challenge = GetEnumValueFromString<EChallenge>("EChallenge", ParseLine); //Back From String!
 /**
  * 
  */
@@ -47,6 +66,10 @@ class PLAYGROUND_API UEnumGameSessions : public UUserDefinedEnum
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ERisk RiskEnum;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EOperationSize OperationSizeEnum;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EGameModifiers GameModifiers;
 };

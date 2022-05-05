@@ -22,7 +22,6 @@ struct FSessionResultWrapper
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input)
 	EGameModifiers Modifiers;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input)
-	TArray<FString> Foobar;
 	FString HostName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input)
 	FString Description;

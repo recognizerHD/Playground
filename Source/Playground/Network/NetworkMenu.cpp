@@ -2,7 +2,6 @@
 
 
 #include "NetworkMenu.h"
-
 #include "MultiplayerSessionsSubsystem.h"
 #include "OnlineSubsystem.h"
 
@@ -207,7 +206,7 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 	}
 
 	TArray<ERisk> Risks;
-	Risks.Push(new FString(ERisk::RE_Easy));
+	Risks.Push(ERisk::RE_Easy);
 	Risks.Push(ERisk::RE_Moderate);
 	Risks.Push(ERisk::RE_Hard);
 	Risks.Push(ERisk::RE_Professional);
@@ -290,7 +289,9 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 		auto ResultToAdd = FSessionResultWrapper{};
 		ResultToAdd.searchResult = *(new FOnlineSessionSearchResult());
 		int8 iRisk = rand() % Risks.Num();
-		ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Risk"), Risks[iRisk]);
+		
+		// Example usage GetEnumValueAsString<EVictoryEnum>("EVictoryEnum", VictoryEnum)));
+		ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Risk"), GetEnumValueAsString<ERisk>("ERisk", Risks[iRisk]));
 		int8 iTeam = rand() % 4;
 		FString teamString = "";
 		for (int8 j = 1; j <= 4; j++)
@@ -316,7 +317,7 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 		bool bIsStarted = (rand() % 2) ? true : false;
 		ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Time"), bIsStarted ? iTime : -1);
 		int8 iSize = rand() % OperationSizes.Num();
-		ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Size"), OperationSizes[iSize]);
+		ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Size"), GetEnumValueAsString<EOperationSize>("EOperationSize", OperationSizes[iSize]));
 		int8 iHost = rand() % HostNames.Num();
 		ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Host"), HostNames[iHost]);
 		int8 iDesc = rand() % ServerDescriptions.Num();
