@@ -147,8 +147,9 @@ void UNetworkMenu::OnCreateSession(bool bWasSuccessful)
 	}
 }
 
-void UNetworkMenu::FindSessions()
+void UNetworkMenu::FindSessions(FString SearchString)
 {
+	// Make 
 	if (MultiplayerSessionsSubsystem)
 	{
 		MultiplayerSessionsSubsystem->FindSession(10000);
@@ -313,7 +314,8 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 			}
 		}
 		ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Team"), teamString);
-		int8 iTime = rand() % (60 * 60);
+		// int32 iTime = rand() % (60 * 60);
+		uint32 iTime = rand() % (40 * 60);
 		bool bIsStarted = (rand() % 2) ? true : false;
 		ResultToAdd.searchResult.Session.SessionSettings.Set(FName("Time"), bIsStarted ? iTime : -1);
 		int8 iSize = rand() % OperationSizes.Num();
@@ -328,6 +330,8 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 		ResultToAdd.Time = bIsStarted ? iTime : -1;
 		ResultToAdd.Team = teamString;
 		ResultToAdd.Risk = Risks[iRisk];
+
+		UE_LOG(LogTemp, Warning,  TEXT(" >>> %d %s %s"), iTime, *HostNames[iHost], *ServerDescriptions[iDesc]  );
 	
 		StructResults.Add(ResultToAdd);
 	}
@@ -342,7 +346,10 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 
  void UNetworkMenu::JoinSession(FSessionResultWrapper Result)
  {
-	MultiplayerSessionsSubsystem->JoinSession(Result.searchResult);
+	if (Result.searchResult.IsValid())
+	{
+		MultiplayerSessionsSubsystem->JoinSession(Result.searchResult);
+	}
  }
 
 void UNetworkMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
