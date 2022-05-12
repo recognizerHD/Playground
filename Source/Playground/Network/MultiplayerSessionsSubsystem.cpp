@@ -14,12 +14,12 @@
 UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem():
 	// CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &UMultiplayerSessionsSubsystem::OnCreateSessionComplete)),
 	CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
-	FindSessionsCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionComplete)),
-	JoinSessionCompleteDelegate(FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnJoinSessionComplete)),
 	DestroySessionCompleteDelegate(FOnDestroySessionCompleteDelegate::CreateUObject(this, &ThisClass::OnDestroySessionComplete)),
+	FindSessionsCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionComplete)),
+	CancelFindSessionsCompleteDelegate(FOnCancelFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnCancelFindSessionComplete)),
+	JoinSessionCompleteDelegate(FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnJoinSessionComplete)),
 	StartSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
 {
-	
 	if (const IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get())
 	{
 		SessionInterface = Subsystem->GetSessionInterface();
@@ -36,7 +36,7 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
 	 * SessionInterface->UpdateSession() - changing settings, turning off allow join in progress, toggling friends only, etc.
 	 *   - can use the change settings to prevent joining on extraction and results.
 	 */
-	
+
 	if (!SessionInterface.IsValid())
 	{
 		return;
@@ -67,7 +67,7 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
 	// SessionSettings->bAllowJoinViaPresenceFriendsOnly = true; // What is this one?
 	LastSessionSettings->bUseLobbiesIfAvailable = true; // This one might be useful?
 	LastSessionSettings->Set(FName("MatchType"), MatchType, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
-	// LastSessionSettings->Set()
+	// TODO Set the current sessions: Time, Host, Description, Biome, Selected Classes
 	LastSessionSettings->BuildUniqueId = 1; //
 	// SessionSettings->bUsesStats = true; // Does my game use stats?
 	// SessionSettings->bAntiCheatProtected = false; // Will I use anti-cheat?
@@ -93,7 +93,6 @@ void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, b
 }
 
 
-
 void UMultiplayerSessionsSubsystem::FindSession(int32 MaxSearchResults, FString SearchText, TArray<ERisk> Risk)
 {
 	if (!SessionInterface.IsValid())
@@ -107,10 +106,10 @@ void UMultiplayerSessionsSubsystem::FindSession(int32 MaxSearchResults, FString 
 		UE_LOG(LogTemp, Display, TEXT(" >>>> Session already exists. Attempting to find other sessions."));
 		if (GEngine)
 		{
-			GEngine->AddOnScreenDebugMessage( -1, 60.f, FColor::Cyan, FString::Printf(TEXT("Session already exists. Attempting to find other sessions.")));
+			GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Cyan, FString::Printf(TEXT("Session already exists. Attempting to find other sessions.")));
 		}
 	}
-	
+
 	FindSessionsCompleteDelegateHandle = SessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegate);
 	LastSessionSearch = MakeShareable(new FOnlineSessionSearch());
 	LastSessionSearch->MaxSearchResults = MaxSearchResults;
@@ -133,13 +132,6 @@ void UMultiplayerSessionsSubsystem::FindSession(int32 MaxSearchResults, FString 
 
 		MultiplayerOnFindSessionsComplete.Broadcast(TArray<FOnlineSessionSearchResult>(), false);
 	}
-	
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			5, 60.f, FColor::Red,
-			FString::Printf(TEXT("Attempting to find sessions.")));
-	}
 }
 
 void UMultiplayerSessionsSubsystem::OnFindSessionComplete(bool bWasSuccessful)
@@ -156,6 +148,36 @@ void UMultiplayerSessionsSubsystem::OnFindSessionComplete(bool bWasSuccessful)
 	}
 
 	MultiplayerOnFindSessionsComplete.Broadcast(LastSessionSearch->SearchResults, bWasSuccessful);
+}
+
+void UMultiplayerSessionsSubsystem::CancelFindSession()
+{
+	if (!SessionInterface.IsValid())
+	{
+		MultiplayerOnCancelFindSessionComplete.Broadcast(false);
+		return;
+	}
+	
+	CancelFindSessionsCompleteDelegateHandle = SessionInterface->AddOnCancelFindSessionsCompleteDelegate_Handle(CancelFindSessionsCompleteDelegate);
+	if (SessionInterface)
+	{
+		if(!SessionInterface->CancelFindSessions())
+		{
+			SessionInterface->ClearOnCancelFindSessionsCompleteDelegate_Handle(CancelFindSessionsCompleteDelegateHandle);
+			MultiplayerOnCancelFindSessionComplete.Broadcast(false);
+		}
+	}
+
+}
+
+void UMultiplayerSessionsSubsystem::OnCancelFindSessionComplete(bool bWasSuccessful)
+{
+	if (SessionInterface)
+	{
+		SessionInterface->ClearOnCancelFindSessionsCompleteDelegate_Handle(CancelFindSessionsCompleteDelegateHandle);
+	}
+
+	MultiplayerOnCancelFindSessionComplete.Broadcast(bWasSuccessful);
 }
 
 
@@ -189,8 +211,6 @@ void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName SessionName, EOn
 }
 
 
-
-
 void UMultiplayerSessionsSubsystem::DestroySession()
 {
 	if (!SessionInterface.IsValid())
@@ -215,7 +235,7 @@ void UMultiplayerSessionsSubsystem::OnDestroySessionComplete(FName SessionName, 
 	{
 		SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
 	}
-	
+
 	UE_LOG(LogTemp, Warning, TEXT(" >>>> Session Destroyed"));
 	if (bWasSuccessful && bCreateSessionOnDestroy)
 	{
@@ -224,16 +244,6 @@ void UMultiplayerSessionsSubsystem::OnDestroySessionComplete(FName SessionName, 
 	}
 	MultiplayerOnDestroySessionComplete.Broadcast(bWasSuccessful);
 }
-
-
-
-
-
-
-
-
-
-
 
 
 void UMultiplayerSessionsSubsystem::StartSession()

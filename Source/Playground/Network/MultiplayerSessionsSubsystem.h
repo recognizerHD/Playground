@@ -14,19 +14,17 @@
 // Declaring our own custom delegates for the Menu class to bind callbacks to
 //
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnCreateSessionComplete, bool, bWasSuccessful);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnDestroySessionComplete, bool, bWasSuccessful);
 // Not dynamic because FOnlineSessionSearchResult is not a UCLASS, so it can't be DYNAMIC and thus not available to blueprint. 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FMultiplayerOnFindSessionsComplete, const TArray<FOnlineSessionSearchResult>& SessionResults, bool bWasSuccessful);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnCancelFindSessionComplete, bool, bWasSuccessful);
 DECLARE_MULTICAST_DELEGATE_OneParam(FMultiplayerOnJoinSessionComplete, EOnJoinSessionCompleteResult::Type Result);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnDestroySessionComplete, bool, bWasSuccessful);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnStartSessionComplete, bool, bWasSuccessful);
 
 #define SEARCH_DIFFICULTY FName(TEXT("DIFFICULTYSEARCH"))
 // #define SEARCH_DIFFICULTY FName(TEXT("PROXIMITYSEARCH"))
 // #define SEARCH_DIFFICULTY FName(TEXT("DIFFICULTYSEARCH"))
 
-// /**
-//  * 
-//  */ 
 UCLASS()
 class PLAYGROUND_API UMultiplayerSessionsSubsystem : public UGameInstanceSubsystem
 {
@@ -37,18 +35,20 @@ public:
 
 	// To handle session functionality, the menu class will call these.
 	void CreateSession(int32 NumPublicConnections, FString MatchType);
-	void FindSession(int32 MaxSearchResults, FString SearchText, TArray<ERisk> Risk);
-	void JoinSession(const FOnlineSessionSearchResult& SessionResult);
 	void DestroySession();
+	void FindSession(int32 MaxSearchResults, FString SearchText, TArray<ERisk> Risk);
+	void CancelFindSession();
+	void JoinSession(const FOnlineSessionSearchResult& SessionResult);
 	void StartSession();
 
 	//
 	// Our own custom delegates for the Menu class to bind callbacks to.
 	//
 	FMultiplayerOnCreateSessionComplete MultiplayerOnCreateSessionComplete;
-	FMultiplayerOnFindSessionsComplete MultiplayerOnFindSessionsComplete;
-	FMultiplayerOnJoinSessionComplete MultiplayerOnJoinSessionComplete;
 	FMultiplayerOnDestroySessionComplete MultiplayerOnDestroySessionComplete;
+	FMultiplayerOnFindSessionsComplete MultiplayerOnFindSessionsComplete;
+	FMultiplayerOnCancelFindSessionComplete MultiplayerOnCancelFindSessionComplete;
+	FMultiplayerOnJoinSessionComplete MultiplayerOnJoinSessionComplete;
 	FMultiplayerOnStartSessionComplete MultiplayerOnStartSessionComplete;
 protected:
 	//
@@ -56,9 +56,10 @@ protected:
 	// These don't need to be called outside this class.
 	//
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
-	void OnFindSessionComplete(bool bWasSuccessful);
-	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnFindSessionComplete(bool bWasSuccessful);
+	void OnCancelFindSessionComplete(bool bWasSuccessful);
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	void OnStartSessionComplete(FName SessionName, bool bWasSuccessful);
 	
 private:
@@ -71,12 +72,14 @@ private:
 	//
 	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
 	FDelegateHandle CreateSessionCompleteDelegateHandle;
-	FOnFindSessionsCompleteDelegate FindSessionsCompleteDelegate;
-	FDelegateHandle FindSessionsCompleteDelegateHandle;
-	FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;
-	FDelegateHandle JoinSessionCompleteDelegateHandle;
 	FOnDestroySessionCompleteDelegate DestroySessionCompleteDelegate;
 	FDelegateHandle DestroySessionCompleteDelegateHandle;
+	FOnFindSessionsCompleteDelegate FindSessionsCompleteDelegate;
+	FDelegateHandle FindSessionsCompleteDelegateHandle;
+	FOnCancelFindSessionsCompleteDelegate CancelFindSessionsCompleteDelegate;
+	FDelegateHandle CancelFindSessionsCompleteDelegateHandle;
+	FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;
+	FDelegateHandle JoinSessionCompleteDelegateHandle;
 	FOnStartSessionCompleteDelegate StartSessionCompleteDelegate;
 	FDelegateHandle StartSessionCompleteDelegateHandle;
 

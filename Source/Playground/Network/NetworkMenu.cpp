@@ -345,8 +345,6 @@ void UNetworkMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sear
 		ResultToAdd.Time = bIsStarted ? iTime : -1;
 		ResultToAdd.Team = teamString;
 		ResultToAdd.Risk = Risks[iRisk];
-
-		UE_LOG(LogTemp, Warning,  TEXT(" >>> %d %s %s"), iTime, *HostNames[iHost], *ServerDescriptions[iDesc]  );
 	
 		StructResults.Add(ResultToAdd);
 	}
