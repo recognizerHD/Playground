@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "Playground/EnumGameSessions.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "MultiplayerSessionsSubsystem.generated.h"
+
 
 //
 // Declaring our own custom delegates for the Menu class to bind callbacks to
@@ -18,9 +20,13 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FMultiplayerOnJoinSessionComplete, EOnJoinSe
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnDestroySessionComplete, bool, bWasSuccessful);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnStartSessionComplete, bool, bWasSuccessful);
 
-/**
- * 
- */
+#define SEARCH_DIFFICULTY FName(TEXT("DIFFICULTYSEARCH"))
+// #define SEARCH_DIFFICULTY FName(TEXT("PROXIMITYSEARCH"))
+// #define SEARCH_DIFFICULTY FName(TEXT("DIFFICULTYSEARCH"))
+
+// /**
+//  * 
+//  */ 
 UCLASS()
 class PLAYGROUND_API UMultiplayerSessionsSubsystem : public UGameInstanceSubsystem
 {
@@ -31,7 +37,7 @@ public:
 
 	// To handle session functionality, the menu class will call these.
 	void CreateSession(int32 NumPublicConnections, FString MatchType);
-	void FindSession(int32 MaxSearchResults);
+	void FindSession(int32 MaxSearchResults, FString SearchText, TArray<ERisk> Risk);
 	void JoinSession(const FOnlineSessionSearchResult& SessionResult);
 	void DestroySession();
 	void StartSession();
@@ -54,6 +60,7 @@ protected:
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 	void OnStartSessionComplete(FName SessionName, bool bWasSuccessful);
+	
 private:
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<FOnlineSessionSettings> LastSessionSettings;

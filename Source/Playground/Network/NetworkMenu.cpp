@@ -85,6 +85,16 @@ void UNetworkMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatc
 	if (MultiplayerSessionsSubsystem)
 	{
 		MultiplayerSessionsSubsystem->MultiplayerOnCreateSessionComplete.AddDynamic(this, &ThisClass::OnCreateSession);
+
+		/** This only happens sometimes. 
+		Error        LogOutputDevice           === Handled ensure: ===
+		Error        LogOutputDevice           Ensure condition failed: InvocationList[ CurFunctionIndex ] != InDelegate [File:D:\Games\Epic Games\UE_5.0\Engine\Source\Runtime\Core\Public\UObject\ScriptDelegates.h] [Line: 556]
+		Error        LogOutputDevice           Stack: 
+		Error        LogOutputDevice           [Callstack] 0x00007ffa5d81c430 UnrealEditor-Playground.dll!TBaseDynamicMulticastDelegate<FWeakObjectPtr,void,bool>::__Internal_AddDynamic<UNetworkMenu>() [D:\Games\Epic Games\UE_5.0\Engine\Source\Runtime\Core\Public\Delegates\DelegateSignatureImpl.inl:1122]
+		Error        LogOutputDevice           [Callstack] 0x00007ffa5d81da97 UnrealEditor-Playground.dll!UNetworkMenu::MenuSetup() [D:\_dev\minionfactory\unreal\Playground\Source\Playground\Network\NetworkMenu.cpp:88]
+		Error        LogOutputDevice           [Callstack] 0x00007ffa5d823bfd UnrealEditor-Playground.dll!UNetworkMenu::execMenuSetup() [D:\_dev\minionfactory\unreal\Playground\Intermediate\Build\Win64\UnrealEditor\Inc\Playground\NetworkMenu.gen.cpp:310]
+		Error        LogOutputDevice           [Callstack] 0x00007ffa9183bcb7 UnrealEditor-CoreUObject.dll!UnknownFunction []
+		*/
 		MultiplayerSessionsSubsystem->MultiplayerOnFindSessionsComplete.AddUObject(this, &ThisClass::OnFindSessions);
 		MultiplayerSessionsSubsystem->MultiplayerOnJoinSessionComplete.AddUObject(this, &ThisClass::OnJoinSession);
 		MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.AddDynamic(this, &ThisClass::OnDestroySession);
@@ -123,6 +133,11 @@ bool UNetworkMenu::Initialize()
 		return false;
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT(" >>>> Menu created. How often does this appear?"));
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage( 9, 60.f, FColor::Red, TEXT("Menu created. How often does this appear?"));
+	}
 	return true;
 }
 
@@ -147,12 +162,12 @@ void UNetworkMenu::OnCreateSession(bool bWasSuccessful)
 	}
 }
 
-void UNetworkMenu::FindSessions(FString SearchString)
+void UNetworkMenu::FindSessions(const FString SearchString, const TArray<ERisk> SelectedRisks)
 {
-	// Make 
 	if (MultiplayerSessionsSubsystem)
 	{
-		MultiplayerSessionsSubsystem->FindSession(10000);
+		// TArray<ERisk> SelectedRisk;
+		MultiplayerSessionsSubsystem->FindSession(10000, SearchString, SelectedRisks);
 	}
 }
 
@@ -419,7 +434,9 @@ void UNetworkMenu::JoinSessionsDirect()
 {
 	if (MultiplayerSessionsSubsystem)
 	{
-		MultiplayerSessionsSubsystem->FindSession(10000);
+
+		// MultiplayerSessionsSubsystem->FindSession(10000);
+		
 	}
 }
 

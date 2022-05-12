@@ -100,7 +100,7 @@ private:
 	
 	
 	UFUNCTION(BlueprintCallable)
-	virtual void FindSessions(FString SearchString);
+	virtual void FindSessions(const FString SearchString, const TArray<ERisk> SelectedRisks);
 	UFUNCTION(BlueprintCallable)
 	virtual void JoinSession(FSessionResultWrapper Result); // What's supplied is a Result or struct.
 	UFUNCTION(BlueprintCallable)

@@ -6,6 +6,11 @@
 #include "OnlineSubsystem.h"
 
 
+// UE_LOG(LogTemp, Warning, TEXT(" >>>> Sessions found: %d. Sucessful? %d"), LastSessionSearch->SearchResults.Num(), bWasSuccessful);
+// if (GEngine)
+// {
+// 	GEngine->AddOnScreenDebugMessage( 5, 60.f, FColor::Red, FString::Printf(TEXT("Found these results. %d = %d"), LastSessionSearch->SearchResults.Num(), bWasSuccessful));
+// }
 UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem():
 	// CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &UMultiplayerSessionsSubsystem::OnCreateSessionComplete)),
 	CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
@@ -14,8 +19,7 @@ UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem():
 	DestroySessionCompleteDelegate(FOnDestroySessionCompleteDelegate::CreateUObject(this, &ThisClass::OnDestroySessionComplete)),
 	StartSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
 {
-	// IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
-	// if (Subsystem)
+	
 	if (const IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get())
 	{
 		SessionInterface = Subsystem->GetSessionInterface();
@@ -63,6 +67,7 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
 	// SessionSettings->bAllowJoinViaPresenceFriendsOnly = true; // What is this one?
 	LastSessionSettings->bUseLobbiesIfAvailable = true; // This one might be useful?
 	LastSessionSettings->Set(FName("MatchType"), MatchType, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+	// LastSessionSettings->Set()
 	LastSessionSettings->BuildUniqueId = 1; //
 	// SessionSettings->bUsesStats = true; // Does my game use stats?
 	// SessionSettings->bAntiCheatProtected = false; // Will I use anti-cheat?
@@ -89,19 +94,37 @@ void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, b
 
 
 
-void UMultiplayerSessionsSubsystem::FindSession(int32 MaxSearchResults)
+void UMultiplayerSessionsSubsystem::FindSession(int32 MaxSearchResults, FString SearchText, TArray<ERisk> Risk)
 {
 	if (!SessionInterface.IsValid())
 	{
 		return;
 	}
 
+	auto ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
+	if (ExistingSession != nullptr)
+	{
+		UE_LOG(LogTemp, Display, TEXT(" >>>> Session already exists. Attempting to find other sessions."));
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage( -1, 60.f, FColor::Cyan, FString::Printf(TEXT("Session already exists. Attempting to find other sessions.")));
+		}
+	}
+	
 	FindSessionsCompleteDelegateHandle = SessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegate);
 	LastSessionSearch = MakeShareable(new FOnlineSessionSearch());
 	LastSessionSearch->MaxSearchResults = MaxSearchResults;
 	LastSessionSearch->bIsLanQuery = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL" ? true : false; // LAN or Internet
 	LastSessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
-	// LastSessionSearch->QuerySettings.Set(SEARCH_KEYWORDS,)
+	// if (Risk.Num())
+	// {
+	//  // TODO This is not working. I don't know how to search for sessions with 2/5 options selected.  
+	// 	LastSessionSearch->QuerySettings.Set(SEARCH_DIFFICULTY, Risk, EOnlineComparisonOp::In);
+	// }
+	if (!SearchText.IsEmpty())
+	{
+		LastSessionSearch->QuerySettings.Set(SEARCH_KEYWORDS, SearchText, EOnlineComparisonOp::In);
+	}
 
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	if (!SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), LastSessionSearch.ToSharedRef()))
@@ -124,11 +147,6 @@ void UMultiplayerSessionsSubsystem::OnFindSessionComplete(bool bWasSuccessful)
 	if (SessionInterface)
 	{
 		SessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegateHandle);
-	}
-	UE_LOG(LogTemp, Warning, TEXT(" >>>> Sessions found: %d. Sucessful? %d"), LastSessionSearch->SearchResults.Num(), bWasSuccessful);
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage( 5, 60.f, FColor::Red, FString::Printf(TEXT("Found these results. %d = %d"), LastSessionSearch->SearchResults.Num(), bWasSuccessful));
 	}
 
 	if (LastSessionSearch->SearchResults.Num() <= 0)
@@ -206,6 +224,12 @@ void UMultiplayerSessionsSubsystem::OnDestroySessionComplete(FName SessionName, 
 	}
 	MultiplayerOnDestroySessionComplete.Broadcast(bWasSuccessful);
 }
+
+
+
+
+
+
 
 
 
